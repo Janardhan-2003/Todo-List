@@ -32,6 +32,8 @@ const LoginPage = () => {
         email: user.email,
         photoURL: user.photoURL,
       }), { expires: 7 });
+      Cookies.set("userId", user.uid, { expires: 7 });
+      console.log("uid:", user.uid);
       navigate("/");
      
     } catch (error) {

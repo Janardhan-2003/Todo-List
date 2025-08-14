@@ -53,8 +53,8 @@ const HomePage = () => {
   return (
     <>
       <Header />
-      <div>
-        <h1>Welcome {userName}</h1>
+      <div className="flex flex-col items-center mt-10">
+        <h1 className="text-2xl font-bold font-serif">Welcome, {userName}</h1>
         <div className="bg-white rounded-lg shadow-md p-8 w-fit mx-auto mt-10">
           <h1 className="text-2xl font-bold text-slate-900 mb-4">Todo List</h1>
           <div className="flex gap-3">
