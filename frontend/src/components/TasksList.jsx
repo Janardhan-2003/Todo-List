@@ -20,6 +20,7 @@ const TasksList = (props) => {
               type="checkbox"
               checked={task.completed}
               onChange={() => toggleTaskCompletion(task.id)}
+              className="cursor-pointer h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-2"
             />
             <span className="text-slate-950 font-medium">{task.title}</span>
             </div>

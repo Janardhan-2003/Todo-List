@@ -1,2 +1,7 @@
 @import "tailwindcss";
 
+
+
+body {
+  @apply bg-slate-200 text-slate-950 font-sans;
+}

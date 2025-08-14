@@ -1,7 +1,8 @@
 import Cookies from "js-cookie";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth, provider } from "../../auth/FirebaseConfig/Firebase";
 import { signInWithPopup } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 import { FcGoogle } from "react-icons/fc";
 
@@ -9,7 +10,14 @@ const LoginPage = () => {
 
   const [message, setMessage] = useState("");
 
+  const navigate = useNavigate();
 
+  useEffect(()=>{
+    const token = Cookies.get("authToken");
+    if(token){
+      navigate("/");
+    }
+  },[])
 
 
     const handleGoogleLogin = async () => {
@@ -17,7 +25,14 @@ const LoginPage = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const token=await user.getIdToken();
+      console.log("User Details:", user);
       Cookies.set('authToken',token,{expires:7})
+      Cookies.set("UserDetails", JSON.stringify({
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      }), { expires: 7 });
+      navigate("/");
      
     } catch (error) {
       let userMessage = "Google sign-in failed.";

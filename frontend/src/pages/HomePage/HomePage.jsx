@@ -1,14 +1,26 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import {v4 as uuidv4} from "uuid";
 import Header from "../../components/Header";
 import TasksList from "../../components/TasksList";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 
 const HomePage = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
+
+  const navigate = useNavigate();
+  const userName=Cookies.get("UserDetails") ? JSON.parse(Cookies.get("UserDetails")).name : "User";
+
+  useEffect(()=>{
+    const token=Cookies.get("authToken");
+    if(!token){
+      navigate("/login");
+    }
+  },[])
 
   const addTask = () => {
     if (newTask.trim()) {
@@ -42,7 +54,7 @@ const HomePage = () => {
     <>
       <Header />
       <div>
-        <h1>Welcome User</h1>
+        <h1>Welcome {userName}</h1>
         <div className="bg-white rounded-lg shadow-md p-8 w-fit mx-auto mt-10">
           <h1 className="text-2xl font-bold text-slate-900 mb-4">Todo List</h1>
           <div className="flex gap-3">
