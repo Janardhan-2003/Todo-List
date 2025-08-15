@@ -3,6 +3,7 @@
 /backend/node_modules/
 /frontend/.env/
 /backend/.env/
+/backend/config/serviceAccountKey.JSON/
 
 # Logs
 npm-debug.log*
