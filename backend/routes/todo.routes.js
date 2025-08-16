@@ -1,58 +1,113 @@
-import express from "express";
-import Todo from "../models/todo.model.js";
+const express = require("express");
+const Todo = require("../models/todo.model");
+const { messaging } = require("firebase-admin");
 
 const router = express.Router();
 
-// Create a new todo
+//post request to create a new todo
+
 router.post("/", async (req, res) => {
   try {
-    const { uid, title, completed } = req.body;
+    const { uid, id, title, completed } = req.body;
 
-    const newTodo = new Todo({
-      uid,
+    if (!uid || !id || !title || !completed) {
+      return res.status(400).json({ message: "UID, id and title are requied" });
+    }
+
+    const newTodo = {
+      id,
       title,
-      completed: completed || false
-    });
+      completed: completed || false,
+      createdAt: new Date(),
+    };
 
-    await newTodo.save();
-    res.status(201).json(newTodo);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const userDoc = await Todo.findOne({ uid });
+
+    if (userDoc) {
+      userDoc.todos.push(newTodo);
+      await userDoc.save();
+      return res.status(201).json(newTodo);
+    } else {
+      const newUserDoc = new Todo({
+        uid,
+        todos: [newTodo],
+      });
+      await newUserDoc.save();
+      return res.status(201).json(newTodo);
+    }
+  } catch (e) {
+    return res.status(500).json({ message: "Error creating todo", error: e });
   }
 });
 
-// Get all todos for a specific user
+//get all todos of specific user
+
 router.get("/:uid", async (req, res) => {
   try {
-    const todos = await Todo.find({ uid: req.params.uid }).sort({ createdAt: -1 });
-    res.json(todos);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const userDoc = await Todo.findOne({ uid: req.params.uid });
+
+    if (!userDoc) {
+      return res.status(400).json({ message: "User Not Found" });
+    }
+
+    const sortedDocs = userDoc.todos.sort((a, b) => b.createdAt - a.createdAt);
+    res.json(sortedDocs);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
   }
 });
 
-// Update a todo
-router.put("/:id", async (req, res) => {
+//update a todo
+
+router.put("/update/:uid/:todoId", async (req, res) => {
   try {
-    const updatedTodo = await Todo.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
+    const { uid, todoId } = req.params;
+    const { title, completed } = req.body;
+
+    if (title === undefined && completed === undefined) {
+      return res.status(400).json({ message: "Nothing to update" });
+    }
+
+    const updateQuery = {};
+
+    if (title !== undefined) {
+      updateQuery["todos.$.title"] = title;
+    }
+    if (completed !== undefined) {
+      updateQuery["todos.$.completed"] = completed;
+    }
+
+    const result = await Todo.updateOne(
+      { uid, "todos.id": todoId },
+      { $set: updateQuery }
     );
-    res.json(updatedTodo);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    if (result.modifiedCount === 0) {
+      return res.status(500).json({ message: "Todo not found for this user" });
+    }
+
+    return res.status(200).json("Todo update Successfully");
+  } catch (e) {
+    return res.status(500).json({ message: "Error updating todo", error: e });
   }
 });
 
-// Delete a todo
-router.delete("/:id", async (req, res) => {
+//deleta a todo
+
+router.delete("/delete/:uid/:todoId", async (req, res) => {
   try {
-    await Todo.findByIdAndDelete(req.params.id);
-    res.json({ message: "Todo deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const { uid, todoId } = req.params;
+
+    const result = await Todo.updateOne(
+      { uid },
+      { $pull: { todos: { id: todoId } } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json("no todo found for this user");
+    }
+  } catch (e) {
+    res.status(500).json({ message: "Error deleting todo", error: e });
   }
 });
 
-export default router;
+module.exports = router;
