@@ -1,39 +1,65 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import Header from "../../components/Header";
 import TasksList from "../../components/TasksList";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-
+import axios from 'axios';
 
 const HomePage = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
 
   const navigate = useNavigate();
-  const userName=Cookies.get("UserDetails") ? JSON.parse(Cookies.get("UserDetails")).name : "User";
+  const userName = Cookies.get("UserDetails")
+    ? JSON.parse(Cookies.get("UserDetails")).name
+    : "User";
 
-  useEffect(()=>{
-    const token=Cookies.get("authToken");
-    if(!token){
+  useEffect(() => {
+    const token = Cookies.get("authToken");
+    const uid = Cookies.get('userId');
+    if (!token) {
       navigate("/login");
+    }else if(uid){
+      fetchTodos();
     }
-  },[])
+  }, []);
 
-  const addTask = () => {
-    if (newTask.trim()) {
-      setTasks([
-        ...tasks,
-        {
-          id: uuidv4(),
-          title: newTask,
-          completed: false,
-          createdAt: new Date().getDate() + "/" + (new Date().getMonth() + 1) + "/" + new Date().getFullYear(),
-        },
-      ]);
-      setNewTask("");
+const fetchTodos = async () => {
+    const uid = Cookies.get("userID");
+
+    if(!uid) return
+    try {
+      const response = await axios.get(`http://localhost:5000/todo/${uid}`);
+      setTasks(response.data);  // set your state with all todos
+    } catch (e) {
+      console.error("Failed to fetch todos", e);
+    }
+  };
+
+  const addTask = async () => {
+
+    if (!newTask.trim()) return
+
+    const userUID=Cookies.get('userId')
+
+    const payLoad={
+      uid: userUID,
+      id: uuidv4(),
+      title: newTask,
+      completed: false,
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/todo/',payLoad);
+      const createdTodo = response.data
+
+      setTasks(prev=>[...prev,createdTodo]);
+      setNewTask('')
+    }catch(e){
+      console.error("Failed to add todo-item")
     }
   };
 
@@ -77,18 +103,17 @@ const HomePage = () => {
         </div>
       </div>
 
-      {tasks.length===0 ? (
+      {tasks.length === 0 ? (
         <div className="text-center text-slate-500 mt-6">
           No tasks available. Please add a task to get started.
         </div>
-      ):
-
-      
-      (<TasksList
-        tasks={tasks}
-        toggleTaskCompletion={toggleTaskCompletion}
-        deleteTask={deleteTask}
-      />)}
+      ) : (
+        <TasksList
+          tasks={tasks}
+          toggleTaskCompletion={toggleTaskCompletion}
+          deleteTask={deleteTask}
+        />
+      )}
     </>
   );
 };

@@ -10,7 +10,7 @@ router.post("/", async (req, res) => {
   try {
     const { uid, id, title, completed } = req.body;
 
-    if (!uid || !id || !title || !completed) {
+    if (!uid || !id || !title ) {
       return res.status(400).json({ message: "UID, id and title are requied" });
     }
 
@@ -36,6 +36,7 @@ router.post("/", async (req, res) => {
       return res.status(201).json(newTodo);
     }
   } catch (e) {
+    console.error("Failed to add todo-item", e.response?.data || e.message);
     return res.status(500).json({ message: "Error creating todo", error: e });
   }
 });

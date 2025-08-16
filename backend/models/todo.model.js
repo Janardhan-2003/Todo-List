@@ -10,12 +10,10 @@ const todoSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const nestedSchema=new mongoose.Schema(
-    {
-        uid : {type: String, require: true, unique:true},
-        todos : [todoSchema],
-    }
-)
+const nestedSchema = new mongoose.Schema({
+  uid: { type: String, require: true, unique: true },
+  todos: [todoSchema],
+});
 
 const Todo = mongoose.model("Todo", nestedSchema);
 
