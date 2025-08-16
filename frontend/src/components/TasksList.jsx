@@ -1,7 +1,17 @@
-import {Trash2} from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X } from "lucide-react";
 
 const TasksList = (props) => {
-  const { tasks, toggleTaskCompletion, deleteTask } = props;
+  const {
+    tasks,
+    toggleTaskCompletion,
+    deleteTask,
+    saveEdit,
+    cancelEdit,
+    startEdit,
+    editingId,
+    editingText,
+    setEditingText,
+  } = props;
 
   return (
     <div className="bg-slate-100 p-6 rounded-lg shadow-md max-w-3xl mx-auto mt-8">
@@ -15,30 +25,68 @@ const TasksList = (props) => {
             }`}
           >
             <div className="flex items-center justify-between w-full">
-            <div className="flex gap-2 wrap-anywhere">
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={() => toggleTaskCompletion(task.id)}
-              className="cursor-pointer h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-2"
-            />
-            <span className="text-slate-950 font-medium">{task.title}</span>
-            </div>
-            
-            <button
-              className="cursor-pointer text-sm text-red-500 hover:text-red-700 ml-4"
-              onClick={() => deleteTask(task.id)}
-            >
-              <span className="text-red-500 ml-4">
-                <Trash2 className="h-4 w-4" />
-              </span>
-            </button>
+              <div className="flex gap-2 wrap-anywhere">
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => toggleTaskCompletion(task.id)}
+                  className="cursor-pointer h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-2"
+                />
+
+                {editingId === task.id ? (
+                  <input
+                    value={editingText}
+                    onChange={(e) => setEditingText(e.target.value)}
+                    className="border px-2 py-1 rounded"
+                  />
+                ) : (
+                  <span className="text-slate-950 font-medium">
+                    {task.title}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                {editingId === task.id ? (
+                  <>
+                    <button
+                      onClick={() => saveEdit(task.id)}
+                      className="p-1 text-green-600 hover:bg-green-50 rounded"
+                    >
+                      <Check className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => cancelEdit()}
+                      className="p-1 text-red-600 hover:bg-red-50 rounded"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => startEdit(task.id, task.title)}
+                      className="p-1 text-slate-600 hover:bg-slate-100 rounded"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => deleteTask(task.id)}
+                      className="p-1 text-red-600 hover:bg-red-50 rounded"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             <div className="flex justify-between items-center">
-            <span className="ml-4 mt-4 text-sm text-slate-500">
-              {task.completed ? "Completed" : "Pending"}
-            </span>
-            <p className="ml-6 mt-4 text-sm text-slate-500">Created at {task.createdAt}</p>
+              <span className="ml-4 mt-4 text-sm text-slate-500">
+                {task.completed ? "Completed" : "Pending"}
+              </span>
+              <p className="ml-6 mt-4 text-sm text-slate-500">
+                Created at {task.createdAt}
+              </p>
             </div>
           </li>
         ))}

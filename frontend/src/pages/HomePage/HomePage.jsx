@@ -6,11 +6,13 @@ import Header from "../../components/Header";
 import TasksList from "../../components/TasksList";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import axios from 'axios';
+import axios from "axios";
 
 const HomePage = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editingText, setEditingText] = useState("");
 
   const navigate = useNavigate();
   const userName = Cookies.get("UserDetails")
@@ -19,61 +21,107 @@ const HomePage = () => {
 
   useEffect(() => {
     const token = Cookies.get("authToken");
-    const uid = Cookies.get('userId');
+    const uid = Cookies.get("userId");
     if (!token) {
       navigate("/login");
-    }else if(uid){
+    } else if (uid) {
       fetchTodos();
     }
-  }, []);
+  }, [tasks]);
 
-const fetchTodos = async () => {
-    const uid = Cookies.get("userID");
+  const fetchTodos = async () => {
+    const uid = Cookies.get("userId");
 
-    if(!uid) return
+    if (!uid) return;
     try {
       const response = await axios.get(`http://localhost:5000/todo/${uid}`);
-      setTasks(response.data);  // set your state with all todos
+      setTasks(response.data); // set your state with all todos
     } catch (e) {
       console.error("Failed to fetch todos", e);
     }
   };
 
   const addTask = async () => {
+    if (!newTask.trim()) return;
 
-    if (!newTask.trim()) return
+    const userUID = Cookies.get("userId");
 
-    const userUID=Cookies.get('userId')
-
-    const payLoad={
+    const payLoad = {
       uid: userUID,
       id: uuidv4(),
       title: newTask,
       completed: false,
-    }
+    };
 
     try {
-      const response = await axios.post('http://localhost:5000/todo/',payLoad);
-      const createdTodo = response.data
+      const response = await axios.post("http://localhost:5000/todo/", payLoad);
+      const createdTodo = response.data;
 
-      setTasks(prev=>[...prev,createdTodo]);
-      setNewTask('')
-    }catch(e){
-      console.error("Failed to add todo-item")
+      setTasks((prev) => [...prev, createdTodo]);
+      setNewTask("");
+    } catch (e) {
+      console.error("Failed to add todo-item");
     }
   };
 
-  const deleteTask = (taskId) => {
-    const filteredTaks = tasks.filter((each) => each.id !== taskId);
-    setTasks(filteredTaks);
+  const startEdit = (id, text) => {
+    setEditingId(id);
+    setEditingText(text);
   };
 
-  const toggleTaskCompletion = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const saveEdit = async (taskId) => {
+    const uid = Cookies.get("userId");
+    try {
+      await axios.put(`http://localhost:5000/todo/update/${uid}/${taskId}`, {
+        title: editingText,
+      });
+
+      setTasks(
+        tasks.map((task) =>
+          task.id === editingId ? { ...task, text: editingText.trim() } : task
+        )
+      );
+      setEditingId(null);
+      setEditingText("");
+    } catch (e) {
+      console.error("Failed to update the todo", e);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingText("");
+  };
+
+  const deleteTask = async (taskId) => {
+    const uid = Cookies.get("userId");
+
+    try {
+      await axios.delete(`http://localhost:5000/todo/delete/${uid}/${taskId}`);
+      const filteredTaks = tasks.filter((each) => each.id !== taskId);
+      setTasks(filteredTaks);
+    } catch (e) {
+      console.error("Todo not found to Delete.", e);
+    }
+  };
+
+  const toggleTaskCompletion = async (taskId) => {
+    const uid = Cookies.get("userId");
+    const target = tasks.find((t) => t.id === taskId);
+
+    try {
+      await axios.put(`http://localhost:5000/todo/update/${uid}/${taskId}`, {
+        completed: !target.completed,
+      });
+
+      setTasks(
+        tasks.map((task) =>
+          task.id === taskId ? { ...task, completed: !task.completed } : task
+        )
+      );
+    } catch (e) {
+      console.error("Failed to toggle completion.", e);
+    }
   };
 
   return (
@@ -112,6 +160,12 @@ const fetchTodos = async () => {
           tasks={tasks}
           toggleTaskCompletion={toggleTaskCompletion}
           deleteTask={deleteTask}
+          startEdit={startEdit}
+          saveEdit={saveEdit}
+          cancelEdit={cancelEdit}
+          editingId={editingId}
+          editingText={editingText}
+          setEditingText={setEditingText}
         />
       )}
     </>
