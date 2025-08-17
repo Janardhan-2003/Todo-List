@@ -5,7 +5,14 @@ const todoSchema = new mongoose.Schema(
     id: { type: String, require: true },
     title: { type: String, required: true },
     completed: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
+    createdAt: {
+      type: Date,
+      default: () => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // remove time part
+        return today;
+      },
+    },
   },
   { _id: false }
 );

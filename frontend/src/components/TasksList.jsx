@@ -1,6 +1,10 @@
 import { Plus, Trash2, Edit2, Check, X, Clock, CheckCircle2, Circle } from "lucide-react";
 
 const TasksList = (props) => {
+  const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+};
   const {
     tasks,
     toggleTaskCompletion,
@@ -130,7 +134,7 @@ const TasksList = (props) => {
 
                   {task.createdAt && (
                     <span className="text-gray-400 text-xs">
-                      Created {task.createdAt}
+                      Created At : {formatDate(task.createdAt)}
                     </span>
                   )}
                 </div>
