@@ -125,50 +125,120 @@ const HomePage = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="flex flex-col items-center mt-10">
-        <h1 className="text-2xl font-bold font-serif">Welcome, {userName}</h1>
-        <div className="bg-white rounded-lg shadow-md p-8 w-fit mx-auto mt-10">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Todo List</h1>
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addTask()}
-              placeholder="Add a new task..."
-              className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent lg:w-120"
-            />
+      
+      {/* Main Content Container */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        
+        {/* Welcome Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Welcome back, <span className="text-blue-600">{userName}</span>
+          </h1>
+          <p className="text-gray-600 text-lg">Stay organized and get things done</p>
+        </div>
+
+        {/* Todo Input Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <h2 className="text-xl font-semibold text-gray-900">Add New Task</h2>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addTask()}
+                placeholder="What needs to be done?"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-900 placeholder-gray-500"
+              />
+            </div>
             <button
-              className="bg-sky-500 text-white px-4 py-2 rounded-lg hover:bg-sky-600 transition-colors flex items-center gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md active:scale-95"
               onClick={addTask}
             >
-              <Plus className="h-4 w-4" />
-              Add
+              <Plus className="h-5 w-5" />
+              <span className="hidden sm:inline">Add Task</span>
+              <span className="sm:hidden">Add</span>
             </button>
           </div>
         </div>
-      </div>
 
-      {tasks.length === 0 ? (
-        <div className="text-center text-slate-500 mt-6">
-          No tasks available. Please add a task to get started.
+        {/* Tasks Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-8 py-6 border-b border-gray-100 bg-gray-50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <h2 className="text-xl font-semibold text-gray-900">Your Tasks</h2>
+              </div>
+              {tasks.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">
+                    {tasks.filter(task => task.completed).length} of {tasks.length} completed
+                  </span>
+                  <div className="w-16 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(tasks.filter(task => task.completed).length / tasks.length) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {tasks.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Plus className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks yet</h3>
+              <p className="text-gray-500 mb-6">Create your first task to get started on your productivity journey</p>
+              <div className="inline-flex items-center text-sm text-gray-400">
+                <span>Press Enter or click Add Task to create one</span>
+              </div>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              <TasksList
+                tasks={tasks}
+                toggleTaskCompletion={toggleTaskCompletion}
+                deleteTask={deleteTask}
+                startEdit={startEdit}
+                saveEdit={saveEdit}
+                cancelEdit={cancelEdit}
+                editingId={editingId}
+                editingText={editingText}
+                setEditingText={setEditingText}
+              />
+            </div>
+          )}
         </div>
-      ) : (
-        <TasksList
-          tasks={tasks}
-          toggleTaskCompletion={toggleTaskCompletion}
-          deleteTask={deleteTask}
-          startEdit={startEdit}
-          saveEdit={saveEdit}
-          cancelEdit={cancelEdit}
-          editingId={editingId}
-          editingText={editingText}
-          setEditingText={setEditingText}
-        />
-      )}
-    </>
+
+        {/* Stats Footer */}
+        {tasks.length > 0 && (
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{tasks.length}</div>
+              <div className="text-sm text-gray-600">Total Tasks</div>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{tasks.filter(task => task.completed).length}</div>
+              <div className="text-sm text-gray-600">Completed</div>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+              <div className="text-2xl font-bold text-orange-600">{tasks.filter(task => !task.completed).length}</div>
+              <div className="text-sm text-gray-600">Pending</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
