@@ -34,7 +34,7 @@ const HomePage = () => {
 
     if (!uid) return;
     try {
-      const response = await axios.get(`http://localhost:5000/todo/${uid}`);
+      const response = await axios.get(`https://todo-list-tjm3.onrender.com/todo/${uid}`);
       setTasks(response.data); // set your state with all todos
     } catch (e) {
       console.error("Failed to fetch todos", e);
@@ -54,7 +54,7 @@ const HomePage = () => {
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/todo/", payLoad);
+      const response = await axios.post("https://todo-list-tjm3.onrender.com/todo/", payLoad);
       const createdTodo = response.data;
 
       setTasks((prev) => [...prev, createdTodo]);
@@ -72,7 +72,7 @@ const HomePage = () => {
   const saveEdit = async (taskId) => {
     const uid = Cookies.get("userId");
     try {
-      await axios.put(`http://localhost:5000/todo/update/${uid}/${taskId}`, {
+      await axios.put(`https://todo-list-tjm3.onrender.com/todo/update/${uid}/${taskId}`, {
         title: editingText,
       });
 
@@ -97,7 +97,7 @@ const HomePage = () => {
     const uid = Cookies.get("userId");
 
     try {
-      await axios.delete(`http://localhost:5000/todo/delete/${uid}/${taskId}`);
+      await axios.delete(`https://todo-list-tjm3.onrender.com/todo/delete/${uid}/${taskId}`);
       const filteredTaks = tasks.filter((each) => each.id !== taskId);
       setTasks(filteredTaks);
     } catch (e) {
@@ -110,7 +110,7 @@ const HomePage = () => {
     const target = tasks.find((t) => t.id === taskId);
 
     try {
-      await axios.put(`http://localhost:5000/todo/update/${uid}/${taskId}`, {
+      await axios.put(`https://todo-list-tjm3.onrender.com/todo/update/${uid}/${taskId}`, {
         completed: !target.completed,
       });
 
