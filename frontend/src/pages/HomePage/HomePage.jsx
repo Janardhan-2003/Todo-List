@@ -100,6 +100,7 @@ const HomePage = () => {
       await axios.delete(`https://todo-list-tjm3.onrender.com/todo/delete/${uid}/${taskId}`);
       const filteredTaks = tasks.filter((each) => each.id !== taskId);
       setTasks(filteredTaks);
+      fetchTodos();
     } catch (e) {
       console.error("Todo not found to Delete.", e);
     }

@@ -13,7 +13,7 @@ const Header = () => {
     signOut(auth)
       .then(() => {
         Cookies.remove("authToken");
-        Cookies.remove('UserId');
+        Cookies.remove('userId');
         Cookies.remove("UserDetails");
         navigate('/login')
       })
