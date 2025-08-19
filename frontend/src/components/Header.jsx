@@ -1,29 +1,26 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../auth/FirebaseConfig/Firebase";
 import Cookies from "js-cookie";
+import { Cookie } from "lucide-react";
 
 const Header = () => {
   const navigate = useNavigate();
-  
+  const location = useLocation();
 
- 
-const handleLogout = async () => {
-  const auth = getAuth();
-  try {
-    await signOut(auth);
-    
-    // remove cookies
-    Cookies.remove("authToken");
-    Cookies.remove("userId");
-    Cookies.remove("UserDetails");
-
-    navigate("/login");
-  } catch (e) {
-    console.error("Error signing out:", e);
-  }
-};
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        Cookies.remove("authToken");
+        Cookies.remove('UserId');
+        Cookies.remove("UserDetails");
+        navigate('/login')
+      })
+      .catch((error) => {
+        console.error("Logout Error:", error);
+      });
+  };
   return (
     <div className="flex justify-between items-center bg-white p-4 shadow-md w-full px-10 sticky left-0">
       <div>
