@@ -10,7 +10,7 @@ router.post("/", async (req, res) => {
   try {
     const { uid, id, title, completed } = req.body;
 
-    if (!uid || !id || !title ) {
+    if (!uid || !id || !title) {
       return res.status(400).json({ message: "UID, id and title are requied" });
     }
 
@@ -106,8 +106,9 @@ router.delete("/delete/:uid/:todoId", async (req, res) => {
     if (result.modifiedCount === 0) {
       return res.status(400).json("no todo found for this user");
     }
+    return res.status(200).json({ message: "Todo deleted successfully" });
   } catch (e) {
-    res.status(500).json({ message: "Error deleting todo", error: e });
+    return res.status(500).json({ message: "Error deleting todo", error: e });
   }
 });
 
