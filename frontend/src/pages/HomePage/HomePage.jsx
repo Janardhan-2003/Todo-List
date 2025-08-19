@@ -27,7 +27,7 @@ const HomePage = () => {
     } else if (uid) {
       fetchTodos();
     }
-  }, [tasks]);
+  }, []);
 
   const fetchTodos = async () => {
     const uid = Cookies.get("userId");

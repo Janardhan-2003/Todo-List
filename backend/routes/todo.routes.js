@@ -48,7 +48,7 @@ router.get("/:uid", async (req, res) => {
     const userDoc = await Todo.findOne({ uid: req.params.uid });
 
     if (!userDoc) {
-      return res.status(400).json({ message: "User Not Found" });
+      return res.status(200).json([]);
     }
 
     const sortedDocs = userDoc.todos.sort((a, b) => b.createdAt - a.createdAt);
