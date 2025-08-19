@@ -99,15 +99,6 @@ VITE_FIREBASE_AUTH_DOMAIN=yourdomain
 
 ---
 
-## 🚀 Future Enhancements
-
-* 📝 Add due dates, reminders & priorities
-* 🕓 Real-time collaboration & shared lists
-* ⚡ PWA support (installable on mobile)
-* 🔍 Search, filter, and pagination
-
----
-
 ## 🙋 Author
 
 Made with ❤️ by **Kokatam Janardhan Reddy**
